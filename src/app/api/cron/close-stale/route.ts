@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'node:crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
@@ -7,10 +8,17 @@ export const dynamic = 'force-dynamic';
 // Entries open longer than this are auto-closed.
 const STALE_HOURS = 16;
 
+function authorized(headerValue: string | null): boolean {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || !headerValue) return false;
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const got = Buffer.from(headerValue);
+  if (expected.length !== got.length) return false;
+  return timingSafeEqual(expected, got);
+}
+
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  const expected = `Bearer ${process.env.CRON_SECRET ?? ''}`;
-  if (!process.env.CRON_SECRET || authHeader !== expected) {
+  if (!authorized(request.headers.get('authorization'))) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 

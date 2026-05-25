@@ -7,6 +7,7 @@ export default function CreateUserForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,13 +63,23 @@ export default function CreateUserForm() {
           />
         </div>
         <div>
-          <label className="label" htmlFor="new-password">Initial password</label>
+          <label className="label" htmlFor="new-password">
+            Initial password
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="link-toggle"
+              aria-pressed={showPassword}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </label>
           <input
             id="new-password"
-            type="text"
+            type={showPassword ? 'text' : 'password'}
             required
             minLength={8}
-            autoComplete="off"
+            autoComplete="new-password"
             className="input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -96,6 +107,19 @@ export default function CreateUserForm() {
         @media (min-width: 640px) {
           .create-user-grid { grid-template-columns: 1fr 1fr !important; }
         }
+        .link-toggle {
+          background: none;
+          border: 0;
+          padding: 0;
+          margin-left: 8px;
+          font: inherit;
+          font-size: var(--fs-xs);
+          color: var(--accent);
+          cursor: pointer;
+          text-transform: none;
+          letter-spacing: 0;
+        }
+        .link-toggle:hover { color: var(--accent-hover); }
       `}</style>
     </form>
   );

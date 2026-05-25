@@ -199,13 +199,11 @@ export default async function AdminPage({
 
       <TotalsPanel period={period} rows={totalsRows} />
 
-      <h2>Add a new user</h2>
+      <h2>All entries</h2>
       <p className="muted" style={{ marginTop: -8, marginBottom: 'var(--space-3)' }}>
-        There is no public signup. Tick the box to make the new user an admin too.
+        Most recent 500 entries. Filter by user to narrow down. Tap a 📍 to open in Google Maps.
       </p>
-      <div className="card">
-        <CreateUserForm />
-      </div>
+      <EntriesFilter entries={entries} profiles={profiles} projects={projects} />
 
       <h2>All users</h2>
       <p className="muted" style={{ marginTop: -8, marginBottom: 'var(--space-3)' }}>
@@ -245,11 +243,13 @@ export default async function AdminPage({
         </div>
       </div>
 
-      <h2>All entries</h2>
+      <h2>Add a new user</h2>
       <p className="muted" style={{ marginTop: -8, marginBottom: 'var(--space-3)' }}>
-        Most recent 500 entries. Filter by user to narrow down. Tap a 📍 to open in Google Maps.
+        There is no public signup. Tick the box to make the new user an admin too.
       </p>
-      <EntriesFilter entries={entries} profiles={profiles} projects={projects} />
+      <div className="card">
+        <CreateUserForm />
+      </div>
     </main>
   );
 }
