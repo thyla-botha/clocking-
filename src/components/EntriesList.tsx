@@ -8,6 +8,8 @@ export type Entry = {
   start_lng: number | null;
   end_lat: number | null;
   end_lng: number | null;
+  start_address?: string | null;
+  end_address?: string | null;
   project_id: string | null;
   notes: string | null;
   auto_closed: boolean | null;
@@ -61,7 +63,7 @@ export default function EntriesList({
             <th>Start</th>
             <th>End</th>
             <th>Duration</th>
-            <th>Locations</th>
+            <th>Location</th>
             <th>Notes</th>
           </tr>
         </thead>
@@ -78,17 +80,56 @@ export default function EntriesList({
                 {e.auto_closed && <span className="badge badge--auto" style={{ marginLeft: 6 }}>auto</span>}
               </td>
               <td data-label="Duration" className="tabular">{fmtDuration(e.start_at, e.end_at)}</td>
-              <td data-label="Locations">
-                {e.start_lat != null && e.start_lng != null ? (
-                  <a href={mapsLink(e.start_lat, e.start_lng)} target="_blank" rel="noreferrer">start</a>
+              <td data-label="Location" style={{ maxWidth: 320 }}>
+                {e.start_address || (e.start_lat != null && e.start_lng != null) ? (
+                  <div className="stack" style={{ gap: 4 }}>
+                    <div>
+                      <span aria-hidden style={{ marginRight: 4 }}>📍</span>
+                      {e.start_address ? (
+                        <a
+                          href={e.start_lat != null && e.start_lng != null ? mapsLink(e.start_lat, e.start_lng) : '#'}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Open in Google Maps"
+                        >
+                          {e.start_address}
+                        </a>
+                      ) : (
+                        <a
+                          href={mapsLink(e.start_lat as number, e.start_lng as number)}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          View start on map
+                        </a>
+                      )}
+                    </div>
+                    {(e.end_address || (e.end_lat != null && e.end_lng != null)) && (
+                      <div className="subtle" style={{ fontSize: 'var(--fs-xs)' }}>
+                        <span aria-hidden style={{ marginRight: 4 }}>→</span>
+                        {e.end_address ? (
+                          <a
+                            href={e.end_lat != null && e.end_lng != null ? mapsLink(e.end_lat, e.end_lng) : '#'}
+                            target="_blank"
+                            rel="noreferrer"
+                            title="Open in Google Maps"
+                          >
+                            {e.end_address}
+                          </a>
+                        ) : (
+                          <a
+                            href={mapsLink(e.end_lat as number, e.end_lng as number)}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            View end on map
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <span className="subtle">—</span>
-                )}
-                {e.end_lat != null && e.end_lng != null && (
-                  <>
-                    {' · '}
-                    <a href={mapsLink(e.end_lat, e.end_lng)} target="_blank" rel="noreferrer">end</a>
-                  </>
                 )}
               </td>
               <td data-label="Notes" style={{ maxWidth: 280, whiteSpace: 'pre-wrap' }}>

@@ -24,7 +24,7 @@ export default async function DashboardPage() {
     supabase
       .from('time_entries')
       .select(
-        'id, start_at, end_at, start_lat, start_lng, end_lat, end_lng, project_id, notes, auto_closed',
+        'id, start_at, end_at, start_lat, start_lng, end_lat, end_lng, start_address, end_address, project_id, notes, auto_closed',
       )
       .eq('user_id', user.id)
       .order('start_at', { ascending: false })
@@ -41,14 +41,17 @@ export default async function DashboardPage() {
     <main className="container">
       <header className="topbar">
         <div className="topbar__brand">
-          <span className="topbar__brand-mark">C</span>
-          <span>Clockify</span>
+          <span className="topbar__brand-mark">TS</span>
+          <span>TimeStamp</span>
         </div>
         <div className="topbar__actions">
           {isAdmin && (
             <Link href="/admin" className="btn ghost">Admin</Link>
           )}
-          <span className="topbar__user">{user.email}</span>
+          <span className="topbar__user">
+            {user.email}
+            {isAdmin && <span className="badge badge--admin" style={{ marginLeft: 8 }}>Admin</span>}
+          </span>
           <SignOutButton />
         </div>
       </header>

@@ -41,8 +41,8 @@ export default function LoginPage() {
       style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
     >
       <div className="topbar__brand" style={{ justifyContent: 'center', marginBottom: 32 }}>
-        <span className="topbar__brand-mark">C</span>
-        <span>Clockify</span>
+        <span className="topbar__brand-mark">TS</span>
+        <span>TimeStamp</span>
       </div>
 
       <div className="card card--hero">

@@ -37,7 +37,7 @@ export default async function AdminPage() {
     supabase
       .from('time_entries')
       .select(
-        'id, user_id, start_at, end_at, start_lat, start_lng, end_lat, end_lng, project_id, notes, auto_closed',
+        'id, user_id, start_at, end_at, start_lat, start_lng, end_lat, end_lng, start_address, end_address, project_id, notes, auto_closed',
       )
       .order('start_at', { ascending: false })
       .limit(500),
@@ -62,12 +62,15 @@ export default async function AdminPage() {
     <main className="container container--wide">
       <header className="topbar">
         <div className="topbar__brand">
-          <span className="topbar__brand-mark">C</span>
-          <span>Clockify <span className="muted" style={{ fontWeight: 500 }}>Admin</span></span>
+          <span className="topbar__brand-mark">TS</span>
+          <span>TimeStamp <span className="muted" style={{ fontWeight: 500 }}>Admin</span></span>
         </div>
         <div className="topbar__actions">
           <Link href="/dashboard" className="btn ghost">My time</Link>
-          <span className="topbar__user">{user.email}</span>
+          <span className="topbar__user">
+            {user.email}
+            <span className="badge badge--admin" style={{ marginLeft: 8 }}>Admin</span>
+          </span>
           <SignOutButton />
         </div>
       </header>
@@ -101,6 +104,9 @@ export default async function AdminPage() {
       </div>
 
       <h2>Open entries</h2>
+      <p className="muted" style={{ marginTop: -8, marginBottom: 'var(--space-3)' }}>
+        Everyone currently clocked in. Force close if someone forgot to clock out.
+      </p>
       <div className="card" style={{ padding: 0 }}>
         {openEntries.length === 0 ? (
           <div className="empty">Nobody is clocked in right now.</div>
@@ -135,10 +141,18 @@ export default async function AdminPage() {
         )}
       </div>
 
-      <h2>Users</h2>
+      <h2>Add a new user</h2>
+      <p className="muted" style={{ marginTop: -8, marginBottom: 'var(--space-3)' }}>
+        There is no public signup. Tick the box to make the new user an admin too.
+      </p>
       <div className="card">
         <CreateUserForm />
       </div>
+
+      <h2>All users</h2>
+      <p className="muted" style={{ marginTop: -8, marginBottom: 'var(--space-3)' }}>
+        Everyone with an account. Anyone with the Admin badge can see this page.
+      </p>
       <div className="card" style={{ padding: 0 }}>
         <div className="table-wrap" style={{ padding: 'var(--space-2) var(--space-2)' }}>
           <table className="table-responsive">
@@ -177,6 +191,9 @@ export default async function AdminPage() {
         <h2>All entries</h2>
         <ExportCsvButton entries={entries} projects={projects} filename="all-time-entries.csv" />
       </div>
+      <p className="muted" style={{ marginTop: -8, marginBottom: 'var(--space-3)' }}>
+        Most recent 500 entries from everyone. Tap a 📍 to open the location in Google Maps.
+      </p>
       <div className="card" style={{ padding: 0 }}>
         <div style={{ padding: 'var(--space-2) var(--space-2)' }}>
           <EntriesList entries={entries} projects={projects} showUser />

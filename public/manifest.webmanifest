@@ -1,6 +1,6 @@
 {
-  "name": "Clockify",
-  "short_name": "Clockify",
+  "name": "TimeStamp",
+  "short_name": "TimeStamp",
   "description": "Clock in and out with location.",
   "start_url": "/dashboard",
   "scope": "/",

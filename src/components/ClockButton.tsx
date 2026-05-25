@@ -7,6 +7,17 @@ import { getPosition, GeoError } from '@/lib/geo';
 import NotesEditor from './NotesEditor';
 import LiveTimer from './LiveTimer';
 
+async function fetchAddress(lat: number, lng: number): Promise<string | null> {
+  try {
+    const res = await fetch(`/api/geocode?lat=${lat}&lng=${lng}`);
+    if (!res.ok) return null;
+    const data = (await res.json()) as { address?: string | null };
+    return data.address ?? null;
+  } catch {
+    return null;
+  }
+}
+
 type Project = { id: string; name: string };
 type OpenEntry = {
   id: string;
@@ -41,6 +52,7 @@ export default function ClockButton({
     setBusy(true);
     try {
       const coords = await getPosition();
+      const address = await fetchAddress(coords.lat, coords.lng);
       const supabase = createClient();
       const { error: insertError } = await supabase.from('time_entries').insert({
         user_id: userId,
@@ -49,6 +61,7 @@ export default function ClockButton({
         start_lat: coords.lat,
         start_lng: coords.lng,
         start_accuracy: coords.accuracy,
+        start_address: address,
       });
       if (insertError) {
         if (insertError.code === '23505') {
@@ -72,6 +85,7 @@ export default function ClockButton({
     setBusy(true);
     try {
       const coords = await getPosition();
+      const address = await fetchAddress(coords.lat, coords.lng);
       const supabase = createClient();
       const { error: updateError } = await supabase
         .from('time_entries')
@@ -80,6 +94,7 @@ export default function ClockButton({
           end_lat: coords.lat,
           end_lng: coords.lng,
           end_accuracy: coords.accuracy,
+          end_address: address,
         })
         .eq('id', openEntry.id);
       if (updateError) {

@@ -30,10 +30,16 @@ create table if not exists time_entries (
   end_lat double precision,
   end_lng double precision,
   end_accuracy double precision,
+  start_address text,
+  end_address text,
   notes text,
   auto_closed boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+-- For existing databases predating these columns
+alter table time_entries add column if not exists start_address text;
+alter table time_entries add column if not exists end_address text;
 
 create index if not exists time_entries_user_start_idx
   on time_entries (user_id, start_at desc);

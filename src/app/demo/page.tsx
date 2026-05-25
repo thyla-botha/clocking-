@@ -78,8 +78,8 @@ export default function DemoPage() {
     <main className="container container--wide">
       <header className="topbar">
         <div className="topbar__brand">
-          <span className="topbar__brand-mark">C</span>
-          <span>Clockify <span className="muted" style={{ fontWeight: 500 }}>Demo</span></span>
+          <span className="topbar__brand-mark">TS</span>
+          <span>TimeStamp <span className="muted" style={{ fontWeight: 500 }}>Demo</span></span>
         </div>
         <Link href="/login" className="btn ghost btn--sm">Go to real app</Link>
       </header>

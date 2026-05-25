@@ -11,13 +11,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Clockify',
+  title: 'TimeStamp',
   description: 'Clock in and out with location.',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Clockify',
+    title: 'TimeStamp',
   },
   icons: {
     icon: '/icon.svg',

@@ -1,6 +1,6 @@
 /* =========================================================
-   Clockify — Flat Design (Touch-First)
-   Time amber + night indigo on slate. Inter typography.
+   TimeStamp — Flat Design (Touch-First)
+   Royal blue on slate. Inter typography.
    ========================================================= */
 
 :root {
@@ -16,14 +16,14 @@
   --text-muted:      #94A3B8;  /* slate-400 */
   --text-subtle:     #64748B;  /* slate-500 */
 
-  --primary:         #D97706;  /* amber-600 — time */
-  --primary-hover:   #B45309;  /* amber-700 */
+  --primary:         #2563EB;  /* blue-600 */
+  --primary-hover:   #1D4ED8;  /* blue-700 */
   --primary-on:      #FFFFFF;
-  --primary-soft:    rgba(217, 119, 6, 0.12);
+  --primary-soft:    rgba(37, 99, 235, 0.14);
 
-  --accent:          #6366F1;  /* indigo-500 */
-  --accent-hover:    #4F46E5;
-  --accent-soft:     rgba(99, 102, 241, 0.14);
+  --accent:          #38BDF8;  /* sky-400 — for links + secondary highlights */
+  --accent-hover:    #0EA5E9;  /* sky-500 */
+  --accent-soft:     rgba(56, 189, 248, 0.14);
 
   --danger:          #DC2626;
   --danger-hover:    #B91C1C;
