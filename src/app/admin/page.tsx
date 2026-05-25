@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import EntriesList, { type Entry } from '@/components/EntriesList';
+import { type Entry } from '@/components/EntriesList';
 import SignOutButton from '../dashboard/SignOutButton';
 import ForceCloseButton from './ForceCloseButton';
 import CreateUserForm from './CreateUserForm';
 import EntriesFilter from './EntriesFilter';
+import TotalsPanel, { PERIOD_KEYS, type PeriodKey, type TotalsRow } from './TotalsPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,39 @@ function initials(email: string | null | undefined) {
   return local.slice(0, 2).toUpperCase();
 }
 
-export default async function AdminPage() {
+function isPeriodKey(v: string | undefined): v is PeriodKey {
+  return !!v && (PERIOD_KEYS as string[]).includes(v);
+}
+
+function periodBounds(key: PeriodKey): { start: Date; end: Date } {
+  const now = new Date();
+  const todayUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const dayIdx = todayUtc.getUTCDay() || 7;
+  const thisMonday = new Date(todayUtc);
+  thisMonday.setUTCDate(todayUtc.getUTCDate() - (dayIdx - 1));
+
+  if (key === 'this-week') return { start: thisMonday, end: now };
+  if (key === 'last-week') {
+    const lastMonday = new Date(thisMonday);
+    lastMonday.setUTCDate(thisMonday.getUTCDate() - 7);
+    return { start: lastMonday, end: thisMonday };
+  }
+  if (key === 'this-month') {
+    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    return { start, end: now };
+  }
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  return { start, end };
+}
+
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams?: { period?: string };
+}) {
+  const period: PeriodKey = isPeriodKey(searchParams?.period) ? searchParams!.period as PeriodKey : 'this-week';
+  const bounds = periodBounds(period);
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
@@ -32,7 +65,7 @@ export default async function AdminPage() {
 
   if (!profile?.is_admin) redirect('/dashboard');
 
-  const [projectsRes, entriesRes, profilesRes] = await Promise.all([
+  const [projectsRes, entriesRes, profilesRes, totalsRes] = await Promise.all([
     supabase.from('projects').select('id, name').order('name'),
     supabase
       .from('time_entries')
@@ -42,6 +75,11 @@ export default async function AdminPage() {
       .order('start_at', { ascending: false })
       .limit(500),
     supabase.from('profiles').select('id, email, is_admin, created_at').order('created_at'),
+    supabase
+      .from('time_entries')
+      .select('user_id, start_at, end_at')
+      .gte('start_at', bounds.start.toISOString())
+      .lt('start_at', bounds.end.toISOString()),
   ]);
 
   const projects = projectsRes.data ?? [];
@@ -57,6 +95,24 @@ export default async function AdminPage() {
   const openEntries = entries.filter((e) => e.end_at === null);
   const totalUsers = profiles.length;
   const admins = profiles.filter((p) => p.is_admin).length;
+
+  const totalsByUser = new Map<string, { minutes: number; entries: number }>();
+  const nowMs = Date.now();
+  for (const e of (totalsRes.data ?? []) as Array<{ user_id: string; start_at: string; end_at: string | null }>) {
+    const startMs = new Date(e.start_at).getTime();
+    const endMs = e.end_at ? new Date(e.end_at).getTime() : nowMs;
+    const mins = Math.max(0, Math.round((endMs - startMs) / 60000));
+    const cur = totalsByUser.get(e.user_id) ?? { minutes: 0, entries: 0 };
+    cur.minutes += mins;
+    cur.entries += 1;
+    totalsByUser.set(e.user_id, cur);
+  }
+  const totalsRows: TotalsRow[] = Array.from(totalsByUser.entries()).map(([userId, v]) => ({
+    userId,
+    email: emailById.get(userId) ?? null,
+    minutes: v.minutes,
+    entries: v.entries,
+  }));
 
   return (
     <main className="container container--wide">
@@ -140,6 +196,8 @@ export default async function AdminPage() {
           </div>
         )}
       </div>
+
+      <TotalsPanel period={period} rows={totalsRows} />
 
       <h2>Add a new user</h2>
       <p className="muted" style={{ marginTop: -8, marginBottom: 'var(--space-3)' }}>
