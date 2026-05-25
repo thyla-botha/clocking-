@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import EntriesList, { type Entry } from '@/components/EntriesList';
-import ExportCsvButton from '@/components/ExportCsvButton';
 import SignOutButton from '../dashboard/SignOutButton';
 import ForceCloseButton from './ForceCloseButton';
 import CreateUserForm from './CreateUserForm';
+import EntriesFilter from './EntriesFilter';
 
 export const dynamic = 'force-dynamic';
 
@@ -187,18 +187,11 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      <div className="section-head">
-        <h2>All entries</h2>
-        <ExportCsvButton entries={entries} projects={projects} filename="all-time-entries.csv" />
-      </div>
+      <h2>All entries</h2>
       <p className="muted" style={{ marginTop: -8, marginBottom: 'var(--space-3)' }}>
-        Most recent 500 entries from everyone. Tap a 📍 to open the location in Google Maps.
+        Most recent 500 entries. Filter by user to narrow down. Tap a 📍 to open in Google Maps.
       </p>
-      <div className="card" style={{ padding: 0 }}>
-        <div style={{ padding: 'var(--space-2) var(--space-2)' }}>
-          <EntriesList entries={entries} projects={projects} showUser />
-        </div>
-      </div>
+      <EntriesFilter entries={entries} profiles={profiles} projects={projects} />
     </main>
   );
 }

@@ -13,6 +13,7 @@ export type Entry = {
   project_id: string | null;
   notes: string | null;
   auto_closed: boolean | null;
+  user_id?: string;
   user_email?: string | null;
 };
 
